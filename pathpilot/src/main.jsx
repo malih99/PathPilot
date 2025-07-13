@@ -1,10 +1,20 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import "./index.css";
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+import { createBrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
+
+import { SessionContextProvider } from "@supabase/auth-helpers-react";
+import { supabase } from "./services/supabase";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <SessionContextProvider supabaseClient={supabase}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </SessionContextProvider>
+  </React.StrictMode>
+);
