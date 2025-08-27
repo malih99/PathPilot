@@ -1,27 +1,47 @@
 import { useState } from "react";
-import Sidebar from "../components/Sidebar";
+import { HiOutlineViewGrid, HiOutlineMail } from "react-icons/hi";
 import Header from "../components/Header";
 
 export default function DashboardLayout({ children }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const menuItems = [
+    { label: "یادگیری", icon: <HiOutlineViewGrid /> },
+    { label: "پیام‌ها", icon: <HiOutlineMail /> },
+  ];
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-10 font-sans">
-  <h1 className="text-3xl font-bold text-slate-800">خوش برگشتی!</h1>
+    <div className="flex min-w-screen h-screen bg-[#f8fafc] font-sans">
+      {/* Sidebar */}
+      <aside className="w-56 bg-[#eef3f9] border-r border-gray-200 p-4 flex flex-col justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-gray-800 mb-6 px-2">
+            مسیر یادگیری
+          </h2>
+          <nav className="space-y-2">
+            {menuItems.map((item) => (
+              <button
+                key={item.label}
+                className="flex items-center w-full gap-3 px-3 py-2 rounded-lg hover:bg-white text-gray-700 transition"
+              >
+                <span className="text-xl">{item.icon}</span>
+                <span className="text-sm">{item.label}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
+      </aside>
 
-  <section className="bg-white rounded-2xl border border-gray-200 p-6 space-y-5">
-    <h2 className="text-lg font-semibold text-slate-700">🎯 اهداف یادگیری</h2>
-    {[{ title: "React", done: 2, total: 5 }, ...].map(...)}
-  </section>
+      {/* Main Content */}
+      {/* <div className="flex-1 flex flex-col"> */}
+      {/* Header */}
+      <Header />
 
-  <section className="bg-white rounded-2xl border border-gray-200 p-6">
-    <h2 className="text-lg font-semibold text-slate-700">✅ تازه‌ترین‌ها</h2>
-    <ul className="text-sm text-gray-700 divide-y divide-gray-200 pt-2">
-      <li className="py-1">Understanding JSX</li>
-      <li className="py-1">Intro to TypeScript</li>
-    </ul>
-  </section>
-</div>
-
+      {/* Page Content */}
+      <main className="flex-1 overflow-y-auto p-8">
+        <div className="max-w-3xl mx-auto w-full">{children}</div>
+      </main>
+      {/* </div> */}
+    </div>
   );
 }

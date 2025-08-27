@@ -67,3 +67,17 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* در index.css اضافه شوند */
+.btn-primary {
+  @apply px-4 py-2 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition;
+}
+.btn-ghost {
+  @apply px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200;
+}
+.input {
+  @apply w-full rounded-xl border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500;
+}
+.textarea {
+  @apply w-full rounded-xl border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500;
+}

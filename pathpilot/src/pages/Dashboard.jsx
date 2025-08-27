@@ -1,9 +1,9 @@
-import DashboardLayout from "../components/Sidebar";
+import DashboardLayout from "../layouts/DashboardLayout";
 
 export default function Dashboard() {
   return (
     <DashboardLayout>
-      <div className="w-full max-w-4xl mx-auto space-y-8 font-sans">
+      <div className="w-full space-y-8 font-sans">
         <h1 className="text-3xl font-bold text-[#2c3e50]">خوش برگشتی!</h1>
 
         {/* اهداف یادگیری */}
