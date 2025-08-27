@@ -1,23 +1,37 @@
 import { supabase } from "../services/supabase";
 
-// دریافت همه مسیرهای یادگیری کاربر لاگین‌شده
-export const fetchLearningPaths = async (userId) => {
+export async function listPaths() {
   const { data, error } = await supabase
     .from("learning_paths")
-    .select("*")
-    .eq("user_id", userId)
+    .select("*, milestones(count), tasks(count)")
     .order("created_at", { ascending: false });
-
   if (error) throw error;
   return data;
-};
+}
 
-// اضافه‌کردن مسیر یادگیری جدید
-export const createLearningPath = async (pathData) => {
+export async function createPath(payload) {
   const { data, error } = await supabase
     .from("learning_paths")
-    .insert([pathData]);
-
+    .insert([payload])
+    .select()
+    .single();
   if (error) throw error;
-  return data[0];
-};
+  return data;
+}
+
+export async function updatePath(id, patch) {
+  const { data, error } = await supabase
+    .from("learning_paths")
+    .update(patch)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deletePath(id) {
+  const { error } = await supabase.from("learning_paths").delete().eq("id", id);
+  if (error) throw error;
+  return true;
+}
