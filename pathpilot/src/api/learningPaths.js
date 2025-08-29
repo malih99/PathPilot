@@ -3,8 +3,14 @@ import { supabase } from "../services/supabase";
 export async function listPaths() {
   const { data, error } = await supabase
     .from("learning_paths")
-    .select("*, milestones(count), tasks(count)")
+    .select(
+      `
+      id, title, description, created_at,
+      milestones(id, title, status, due_date, created_at)
+    `
+    )
     .order("created_at", { ascending: false });
+
   if (error) throw error;
   return data;
 }
