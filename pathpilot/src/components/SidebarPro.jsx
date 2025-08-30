@@ -1,4 +1,3 @@
-// components/SidebarPro.jsx
 import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import { useTheme } from "@mui/material/styles";
@@ -29,18 +28,22 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import FiberManualRecordRoundedIcon from "@mui/icons-material/FiberManualRecordRounded";
 import { NavLink, useLocation } from "react-router-dom";
 
+// صفحات جدید
+import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
+import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
+import EmojiEventsRoundedIcon from "@mui/icons-material/EmojiEventsRounded";
+import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
+
 export const DRAWER_WIDTH = 264;
 export const MINI_WIDTH = 72;
 const APPBAR_HEIGHT = 56;
 
-// —— Tokens (راحت‌ترت می‌کند برای تم/دارک)
 const bgGrad = "linear-gradient(180deg,#0f141b 0%,#0e1117 40%,#0b0e13 100%)";
 const borderCol = "rgba(255,255,255,.08)";
 const textPrimary = "#e5e7eb";
 const textMuted = "#9ca3af";
 const brand = "#8b5cf6";
 
-// open/closed mixins
 const openedMixin = (theme) => ({
   width: DRAWER_WIDTH,
   transition: theme.transitions.create("width", {
@@ -76,11 +79,19 @@ const PermanentDrawer = styled(MuiDrawer, {
   },
 }));
 
-// ——— داده‌ها با سکشن‌بندی حرفه‌ای
+// سکشن‌ها
 const sections = [
   {
     header: "Overview",
-    items: [{ to: "/dashboard", icon: <DashboardIcon />, label: "Dashboard" }],
+    items: [
+      { to: "/dashboard", icon: <DashboardIcon />, label: "Dashboard" },
+      { to: "/reports", icon: <BarChartRoundedIcon />, label: "Reports" },
+      {
+        to: "/achievements",
+        icon: <EmojiEventsRoundedIcon />,
+        label: "Achievements",
+      },
+    ],
   },
   {
     header: "Workspace",
@@ -97,6 +108,14 @@ const sections = [
         label: "Calendar",
       },
       { to: "/messages", icon: <MailOutlineRoundedIcon />, label: "Messages" },
+      { to: "/resources", icon: <MenuBookRoundedIcon />, label: "Resources" },
+    ],
+  },
+  {
+    header: "Account",
+    items: [
+      { to: "/profile", icon: <AccountCircleRoundedIcon />, label: "Profile" },
+      { to: "/settings", icon: <SettingsRoundedIcon />, label: "Settings" },
     ],
   },
 ];
@@ -106,6 +125,7 @@ export default function Sidebar({ open, onToggle, isMdUp }) {
   const theme = useTheme();
   const isRtl = theme.direction === "rtl";
   const anchorSide = isRtl ? "left" : "right";
+
   if (!isMdUp) {
     return (
       <MuiDrawer
@@ -159,21 +179,16 @@ const NavItem = ({ open, to, icon, label, chip, active }) => {
           color: textPrimary,
           transition: "margin .15s",
         },
-        // حالت هاور نرم
-        "&:hover": {
-          backgroundColor: alpha("#ffffff", 0.06),
-        },
-        // حالت انتخابی: pill
+        "&:hover": { backgroundColor: alpha("#ffffff", 0.06) },
         "&.Mui-selected": {
           backgroundColor: alpha("#ffffff", 0.08),
           "&:hover": { backgroundColor: alpha("#ffffff", 0.1) },
         },
-        // indicator بارکَناری
         "&::before": active
           ? {
               content: '""',
               position: "absolute",
-              right: 6, // چون راست‌چینیم
+              right: 6,
               top: 8,
               bottom: 8,
               width: 3,
@@ -224,7 +239,7 @@ const NavItem = ({ open, to, icon, label, chip, active }) => {
 function SidebarContent({ open, onToggle, pathname }) {
   return (
     <>
-      {/* Header (brand + toggle) */}
+      {/* Header */}
       <Toolbar
         sx={{
           minHeight: APPBAR_HEIGHT,
@@ -272,7 +287,7 @@ function SidebarContent({ open, onToggle, pathname }) {
         </Tooltip>
       </Toolbar>
 
-      {/* Scroll area */}
+      {/* Nav sections */}
       <Box sx={{ flex: 1, overflowY: "auto", py: 1 }}>
         {sections.map((sec, si) => (
           <Box key={si} sx={{ mb: 1 }}>
@@ -320,7 +335,7 @@ function SidebarContent({ open, onToggle, pathname }) {
         ))}
       </Box>
 
-      {/* Footer: status + account actions */}
+      {/* Footer */}
       <Divider sx={{ borderColor: borderCol }} />
       <Box
         sx={{
@@ -345,23 +360,6 @@ function SidebarContent({ open, onToggle, pathname }) {
         )}
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          {open && (
-            <Button
-              size="small"
-              startIcon={<SettingsRoundedIcon />}
-              sx={{
-                color: textPrimary,
-                "&:hover": { backgroundColor: alpha("#ffffff", 0.06) },
-                borderRadius: 2,
-                px: 1.25,
-                minWidth: 0,
-                textTransform: "none",
-                fontWeight: 700,
-              }}
-            >
-              Settings
-            </Button>
-          )}
           <Tooltip title="Sign out">
             <IconButton
               size="small"
