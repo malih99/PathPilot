@@ -7,13 +7,20 @@ import {
   ListItemText,
   Chip,
   Typography,
+  Button,
 } from "@mui/material";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import { useTheme } from "@mui/material/styles";
 import { motion } from "framer-motion";
 import { glassCard, slideLeft } from "./_shared";
 
-export default function UpcomingList({ items }) {
+export default function UpcomingList({
+  items,
+  title = "Task list",
+  showAdd = false,
+  onAdd,
+}) {
   const t = useTheme();
   return (
     <Card
@@ -25,12 +32,7 @@ export default function UpcomingList({ items }) {
       <CardHeader
         title={
           <Typography variant="h6" sx={{ fontWeight: 900 }}>
-            📅 نزدیک‌ترین موعدها
-          </Typography>
-        }
-        subheader={
-          <Typography variant="caption" color="text.secondary">
-            ۷ روز آینده
+            {title}
           </Typography>
         }
       />
@@ -71,6 +73,16 @@ export default function UpcomingList({ items }) {
             </motion.div>
           ))}
         </List>
+
+        {showAdd && (
+          <Button
+            onClick={onAdd}
+            startIcon={<AddRoundedIcon />}
+            sx={{ mt: 1, fontWeight: 900 }}
+          >
+            Add task
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

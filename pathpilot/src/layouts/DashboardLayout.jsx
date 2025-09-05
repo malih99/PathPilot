@@ -8,10 +8,33 @@ import {
   IconButton,
   Avatar,
   useMediaQuery,
+  Tooltip,
 } from "@mui/material";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
+import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
+import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import { useTheme } from "@mui/material/styles";
 import Sidebar, { DRAWER_WIDTH, MINI_WIDTH } from "../components/SidebarPro";
+import ThemeToggleFloating from "../components/ThemeToggleFloating";
+
+function useLocalMode() {
+  const theme = useTheme();
+  const [mode, setMode] = React.useState(theme.palette.mode);
+  React.useEffect(() => {
+    const saved = localStorage.getItem("pp-mode");
+    if (saved === "light" || saved === "dark") {
+      document.documentElement.setAttribute("data-pp-mode", saved);
+      setMode(saved);
+    }
+  }, []);
+  const toggle = () => {
+    const next = mode === "dark" ? "light" : "dark";
+    localStorage.setItem("pp-mode", next);
+    document.documentElement.setAttribute("data-pp-mode", next);
+    setMode(next);
+  };
+  return { mode, toggle };
+}
 
 export default function DashboardLayout({ children }) {
   const theme = useTheme();
@@ -60,6 +83,7 @@ export default function DashboardLayout({ children }) {
             minHeight: 56,
             display: "flex",
             justifyContent: "space-between",
+            px: { xs: 1.5, md: 2 },
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: 800 }}>
@@ -71,6 +95,7 @@ export default function DashboardLayout({ children }) {
                 <MenuRoundedIcon />
               </IconButton>
             )}
+            {/* اینجا دکمه تم یا هر اکشن دیگری رو بگذار؛ همیشه داخل عرض AppBar می‌ماند */}
             <Avatar sx={{ width: 30, height: 30 }}>P</Avatar>
           </Box>
         </Toolbar>
@@ -82,6 +107,13 @@ export default function DashboardLayout({ children }) {
         isMdUp={isMdUp}
       />
 
+      <ThemeToggleFloating
+        sidebarOpen={open}
+        isMdUp={isMdUp}
+        drawerWidth={DRAWER_WIDTH}
+        miniWidth={MINI_WIDTH}
+      />
+
       <Box
         component="main"
         sx={{
@@ -90,9 +122,7 @@ export default function DashboardLayout({ children }) {
           ...(isRtl
             ? { ml: { md: `${sidebarOffset}px`, xs: 0 } }
             : { mr: { md: `${sidebarOffset}px`, xs: 0 } }),
-          ...(isRtl
-            ? { pr: 2, pl: { xs: 2, md: 2 } } // در RTL، سایدبار چپ است؛ پس padding راست آزاد است
-            : { pl: 2, pr: { xs: 2, md: 2 } }), // در LTR، سایدبار راست است؛ پس padding چپ آزاد است
+          px: { xs: 2, md: 3 }, // گاتر یکنواخت
           minWidth: 0,
         }}
       >

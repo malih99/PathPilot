@@ -15,7 +15,6 @@ import {
   Avatar,
   Chip,
   ListSubheader,
-  Button,
 } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import MenuOpenRoundedIcon from "@mui/icons-material/MenuOpenRounded";
@@ -24,20 +23,18 @@ import SchoolRoundedIcon from "@mui/icons-material/SchoolRounded";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
-import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import FiberManualRecordRoundedIcon from "@mui/icons-material/FiberManualRecordRounded";
-import { NavLink, useLocation } from "react-router-dom";
-
-// صفحات جدید
 import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import EmojiEventsRoundedIcon from "@mui/icons-material/EmojiEventsRounded";
 import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
+import { NavLink, useLocation } from "react-router-dom";
 
 export const DRAWER_WIDTH = 264;
 export const MINI_WIDTH = 72;
 const APPBAR_HEIGHT = 56;
 
+// استایل: گرادینت تیره + بوردر لطیف
 const bgGrad = "linear-gradient(180deg,#0f141b 0%,#0e1117 40%,#0b0e13 100%)";
 const borderCol = "rgba(255,255,255,.08)";
 const textPrimary = "#e5e7eb";
@@ -79,7 +76,7 @@ const PermanentDrawer = styled(MuiDrawer, {
   },
 }));
 
-// سکشن‌ها
+// ناوبری
 const sections = [
   {
     header: "Overview",
@@ -126,6 +123,7 @@ export default function Sidebar({ open, onToggle, isMdUp }) {
   const isRtl = theme.direction === "rtl";
   const anchorSide = isRtl ? "left" : "right";
 
+  // موبایل: کشویی
   if (!isMdUp) {
     return (
       <MuiDrawer
@@ -154,6 +152,7 @@ export default function Sidebar({ open, onToggle, isMdUp }) {
     );
   }
 
+  // دسکتاپ: دائم
   return (
     <PermanentDrawer variant="permanent" anchor={anchorSide} open={open}>
       <SidebarContent open={open} onToggle={onToggle} pathname={pathname} />
@@ -287,7 +286,7 @@ function SidebarContent({ open, onToggle, pathname }) {
         </Tooltip>
       </Toolbar>
 
-      {/* Nav sections */}
+      {/* Navigation */}
       <Box sx={{ flex: 1, overflowY: "auto", py: 1 }}>
         {sections.map((sec, si) => (
           <Box key={si} sx={{ mb: 1 }}>
@@ -358,20 +357,6 @@ function SidebarContent({ open, onToggle, pathname }) {
             </span>
           </Box>
         )}
-
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          <Tooltip title="Sign out">
-            <IconButton
-              size="small"
-              sx={{
-                color: textPrimary,
-                "&:hover": { backgroundColor: alpha("#ffffff", 0.06) },
-              }}
-            >
-              <LogoutRoundedIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
       </Box>
     </>
   );

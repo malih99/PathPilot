@@ -11,7 +11,7 @@ import { useTheme, alpha } from "@mui/material/styles";
 import { motion } from "framer-motion";
 import { glassCard, fadeUp } from "./_shared";
 
-export default function GoalsProgress({ goals }) {
+export default function GoalsProgress({ goals, title = "Weekly targets" }) {
   const t = useTheme();
   return (
     <Card
@@ -23,13 +23,13 @@ export default function GoalsProgress({ goals }) {
       <CardHeader
         title={
           <Typography variant="h6" sx={{ fontWeight: 900 }}>
-            🎯 اهداف یادگیری
+            {title}
           </Typography>
         }
         action={
           <Chip
             size="small"
-            label="این هفته"
+            label="This week"
             color="primary"
             variant="outlined"
           />
@@ -55,9 +55,11 @@ export default function GoalsProgress({ goals }) {
                 <Typography variant="body2" sx={{ fontWeight: 800 }}>
                   {g.label || g.title}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {g.done} از {g.total}
-                </Typography>
+                {g.rightLabel && (
+                  <Typography variant="caption" color="text.secondary">
+                    {g.rightLabel}
+                  </Typography>
+                )}
               </Box>
               <LinearProgress
                 variant="determinate"
