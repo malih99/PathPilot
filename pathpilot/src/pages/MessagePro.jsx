@@ -1,6 +1,22 @@
+// src/pages/MessagesPro.jsx
 import { useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
-import { Grid, Card, CardContent, Typography } from "@mui/material";
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Paper,
+  useTheme,
+} from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import { motion } from "framer-motion";
+import {
+  glassCard,
+  fadeUp,
+  slideLeft,
+} from "../components/dashboardPro/_shared";
+
 import ThreadsPane from "../components/messagePro/ThreadsPane";
 import ChatPane from "../components/messagePro/ChatPane";
 import Composer from "../components/messagePro/Composer";
@@ -23,6 +39,7 @@ const mockMessages = {
 };
 
 export default function MessagesPro() {
+  const t = useTheme();
   const [q, setQ] = useState("");
   const [active, setActive] = useState("t1");
   const [items, setItems] = useState(mockMessages[active]);
@@ -43,7 +60,6 @@ export default function MessagesPro() {
       }),
     };
     setItems((prev) => [...prev, msg]);
-    // TODO: ارسال به API
   };
 
   const filteredThreads = mockThreads.filter((t) =>
@@ -53,13 +69,17 @@ export default function MessagesPro() {
   return (
     <DashboardLayout>
       <Grid container spacing={2}>
+        {/* لیست گفتگوها */}
         <Grid item xs={12} md={4} lg={3}>
           <Card
+            component={motion.div}
+            {...slideLeft(0.02)}
             elevation={0}
             sx={{
-              borderRadius: 2,
-              border: "1px solid",
-              borderColor: "divider",
+              ...glassCard(t),
+              display: "flex",
+              flexDirection: "column",
+              height: "calc(100dvh - 160px)",
             }}
           >
             <CardContent sx={{ p: 1.5 }}>
@@ -73,16 +93,17 @@ export default function MessagesPro() {
           </Card>
         </Grid>
 
+        {/* پنل گفتگو */}
         <Grid item xs={12} md={8} lg={9}>
           <Card
+            component={motion.div}
+            {...fadeUp(0.04)}
             elevation={0}
             sx={{
+              ...glassCard(t),
               display: "flex",
               flexDirection: "column",
               height: "calc(100dvh - 160px)",
-              borderRadius: 2,
-              border: "1px solid",
-              borderColor: "divider",
             }}
           >
             <ChatPane

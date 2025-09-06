@@ -10,48 +10,43 @@ import {
   Avatar,
   Stack,
   Typography,
+  IconButton,
   useTheme,
-  alpha,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import { motion } from "framer-motion";
+import { glassCard, fadeUp } from "../components/dashboardPro/_shared";
 
-const glass = (t) => ({
-  borderRadius: 16,
-  border: "1px solid",
-  borderColor: alpha(t.palette.divider, 0.55),
-  background:
-    t.palette.mode === "light"
-      ? "linear-gradient(180deg,#fff,rgba(255,255,255,.92))"
-      : alpha(t.palette.background.paper, 0.7),
-  backdropFilter: "saturate(140%) blur(8px)",
-  boxShadow: "0 10px 28px rgba(0,0,0,.08)",
-});
+import CameraAltRoundedIcon from "@mui/icons-material/CameraAltRounded";
 
 export default function ProfilePro() {
   const t = useTheme();
   const [name, setName] = useState("Path Pilot");
   const [bio, setBio] = useState("عاشق یادگیری و کدنویسی!");
+
   return (
     <DashboardLayout>
       <Grid container spacing={2}>
+        {/* کارت پروفایل سمت چپ */}
         <Grid item xs={12} md={4}>
           <Card
             component={motion.div}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
+            {...fadeUp(0)}
             elevation={0}
-            sx={glass(t)}
+            sx={glassCard(t)}
           >
             <CardHeader
               title={<Typography sx={{ fontWeight: 900 }}>پروفایل</Typography>}
             />
             <CardContent>
               <Stack alignItems="center" spacing={2}>
-                <Avatar sx={{ width: 88, height: 88, fontWeight: 900 }}>
-                  PP
-                </Avatar>
-                <Button variant="outlined" size="small">
+                <BoxWithAvatar name={name} />
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<CameraAltRoundedIcon />}
+                  sx={{ fontWeight: 800 }}
+                >
                   تغییر عکس
                 </Button>
               </Stack>
@@ -59,14 +54,13 @@ export default function ProfilePro() {
           </Card>
         </Grid>
 
+        {/* کارت اطلاعات کاربری سمت راست */}
         <Grid item xs={12} md={8}>
           <Card
             component={motion.div}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.05 }}
+            {...fadeUp(0.05)}
             elevation={0}
-            sx={glass(t)}
+            sx={glassCard(t)}
           >
             <CardHeader
               title={
@@ -79,6 +73,7 @@ export default function ProfilePro() {
                   label="نام"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  fullWidth
                 />
                 <TextField
                   label="بیو"
@@ -86,6 +81,7 @@ export default function ProfilePro() {
                   onChange={(e) => setBio(e.target.value)}
                   multiline
                   rows={3}
+                  fullWidth
                 />
                 <Stack direction="row" gap={1} justifyContent="flex-end">
                   <Button variant="outlined">انصراف</Button>
@@ -99,5 +95,57 @@ export default function ProfilePro() {
         </Grid>
       </Grid>
     </DashboardLayout>
+  );
+}
+
+/* -------------------- Subcomponent -------------------- */
+function BoxWithAvatar({ name }) {
+  const t = useTheme();
+  return (
+    <Stack
+      sx={{
+        position: "relative",
+        width: 100,
+        height: 100,
+        borderRadius: "50%",
+        background: `linear-gradient(135deg, ${alpha(
+          t.palette.primary.main,
+          0.9
+        )}, ${alpha(t.palette.secondary.main, 0.9)})`,
+        display: "grid",
+        placeItems: "center",
+        boxShadow: "0 8px 20px rgba(0,0,0,.15)",
+      }}
+    >
+      <Avatar
+        sx={{
+          width: 88,
+          height: 88,
+          fontWeight: 900,
+          fontSize: 28,
+          bgcolor: "white",
+          color: t.palette.primary.main,
+        }}
+      >
+        {name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()}
+      </Avatar>
+      <IconButton
+        size="small"
+        sx={{
+          position: "absolute",
+          bottom: 4,
+          right: 4,
+          bgcolor: "white",
+          border: `1px solid ${alpha(t.palette.primary.main, 0.2)}`,
+          boxShadow: "0 2px 6px rgba(0,0,0,.1)",
+        }}
+      >
+        <CameraAltRoundedIcon fontSize="small" />
+      </IconButton>
+    </Stack>
   );
 }

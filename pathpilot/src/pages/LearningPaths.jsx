@@ -1,10 +1,33 @@
-// src/pages/LearningPaths.jsx
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { usePaths, useCreatePath } from "../queries/paths";
 
-// آیکون‌ها از MUI — با پروژه‌ات هماهنگه
+import {
+  Box,
+  Grid,
+  Card,
+  CardHeader,
+  CardContent,
+  Typography,
+  Chip,
+  Button,
+  IconButton,
+  InputBase,
+  Stack,
+  LinearProgress,
+  Paper,
+  useTheme,
+} from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import { motion } from "framer-motion";
+import {
+  glassCard,
+  fadeUp,
+  slideLeft,
+} from "../components/dashboardPro/_shared";
+
+// Icons
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import FilterListRoundedIcon from "@mui/icons-material/FilterListRounded";
@@ -12,12 +35,14 @@ import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
-import StarBorderRoundedIcon from "@mui/icons-material/StarBorderRounded";
+import StarRoundedIcon from "@mui/icons-material/StarRounded";
 
-// اگر قبلاً داری، همین رو نگه دار
+// Dialog
 import AddPathDialog from "../features/paths/AddPathDialog";
 
+/* ============================= Page ============================= */
 export default function LearningPaths() {
+  const t = useTheme();
   const { data, isLoading, isError, refetch } = usePaths();
   const createPath = useCreatePath();
 
@@ -28,94 +53,138 @@ export default function LearningPaths() {
   const filtered = useMemo(() => {
     let list = data ?? [];
     if (q.trim()) {
-      const t = q.trim().toLowerCase();
+      const k = q.trim().toLowerCase();
       list = list.filter(
         (p) =>
-          p.title?.toLowerCase().includes(t) ||
-          p.description?.toLowerCase().includes(t)
+          p.title?.toLowerCase().includes(k) ||
+          p.description?.toLowerCase().includes(k)
       );
     }
-    if (filter === "active") {
-      list = list.filter((p) => getProgress(p) < 100);
-    } else if (filter === "completed") {
+    if (filter === "active") list = list.filter((p) => getProgress(p) < 100);
+    if (filter === "completed")
       list = list.filter((p) => getProgress(p) >= 100);
-    } else if (filter === "starred") {
-      list = list.filter((p) => !!p.starred);
-    }
+    if (filter === "starred") list = list.filter((p) => !!p.starred);
     return list;
   }, [data, q, filter]);
 
+  const cycleFilter = () =>
+    setFilter((f) =>
+      f === "all"
+        ? "active"
+        : f === "active"
+        ? "completed"
+        : f === "completed"
+        ? "starred"
+        : "all"
+    );
+
   return (
     <DashboardLayout>
-      {/* Header */}
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-extrabold tracking-tight">
-            مسیرهای یادگیری
-          </h1>
-          {/* شمارش مسیرها */}
-          {!isLoading && (
-            <span className="text-sm rounded-full px-2 py-0.5 bg-slate-100 text-slate-600">
-              {filtered.length} مسیر
-            </span>
-          )}
-        </div>
+      {/* Header – شیشه‌ای و فشرده مثل هیروباری که ساختیم */}
+      <Paper
+        component={motion.div}
+        {...fadeUp(0)}
+        elevation={0}
+        sx={{
+          ...glassCard(t),
+          mb: 2,
+          p: 1.5,
+        }}
+      >
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          alignItems={{ xs: "flex-start", md: "center" }}
+          justifyContent="space-between"
+          gap={1.5}
+        >
+          <Stack direction="row" alignItems="center" gap={1}>
+            <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+              مسیرهای یادگیری
+            </Typography>
+            {!isLoading && (
+              <Chip
+                size="small"
+                variant="outlined"
+                color="primary"
+                label={`${filtered.length} مسیر`}
+              />
+            )}
+          </Stack>
 
-        <div className="flex items-center gap-2">
-          {/* جستجو */}
-          <label className="relative hidden md:block">
-            <SearchRoundedIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
+          <Stack direction="row" alignItems="center" gap={1}>
+            {/* Search pill */}
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
+                gap: 1,
+                px: 1.5,
+                py: 0.75,
+                borderRadius: 999,
+                border: `1px solid ${alpha(t.palette.primary.main, 0.18)}`,
+                bgcolor:
+                  t.palette.mode === "light"
+                    ? "rgba(255,255,255,.9)"
+                    : alpha(t.palette.background.paper, 0.6),
+              }}
+            >
+              <SearchRoundedIcon fontSize="small" />
+              <InputBase
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="جستجو بین مسیرها…"
+                sx={{ fontSize: 14, minWidth: 240 }}
+              />
+            </Box>
+
+            {/* Filter chip (چرخه‌ای) */}
+            <Chip
+              icon={<FilterListRoundedIcon />}
+              label={filterLabel(filter)}
+              onClick={cycleFilter}
+              variant="outlined"
+              sx={{ fontWeight: 800 }}
+            />
+
+            {/* Add Path */}
+            <Button
+              onClick={() => setOpen(true)}
+              variant="contained"
+              startIcon={<AddRoundedIcon />}
+              sx={{ fontWeight: 900, borderRadius: 2 }}
+            >
+              افزودن مسیر
+            </Button>
+          </Stack>
+        </Stack>
+
+        {/* سرچ موبایل */}
+        <Box sx={{ mt: 1, display: { xs: "block", md: "none" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              px: 1.25,
+              py: 0.75,
+              borderRadius: 999,
+              border: `1px solid ${alpha(t.palette.primary.main, 0.18)}`,
+              bgcolor:
+                t.palette.mode === "light"
+                  ? "rgba(255,255,255,.9)"
+                  : alpha(t.palette.background.paper, 0.6),
+            }}
+          >
+            <SearchRoundedIcon fontSize="small" />
+            <InputBase
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="جستجو بین مسیرها…"
-              className="w-64 rounded-xl border border-slate-200 bg-white pl-10 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400"
+              sx={{ fontSize: 14, flex: 1 }}
             />
-          </label>
-
-          {/* فیلتر ساده */}
-          <div className="relative">
-            <button
-              onClick={() =>
-                setFilter((f) =>
-                  f === "all"
-                    ? "active"
-                    : f === "active"
-                    ? "completed"
-                    : f === "completed"
-                    ? "starred"
-                    : "all"
-                )
-              }
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm hover:bg-slate-50"
-              title="فیلتر"
-            >
-              <FilterListRoundedIcon fontSize="small" />
-              {filterLabel(filter)}
-            </button>
-          </div>
-
-          {/* افزودن مسیر */}
-          <button
-            className="btn-primary inline-flex items-center gap-2"
-            onClick={() => setOpen(true)}
-          >
-            <AddRoundedIcon />
-            افزودن مسیر
-          </button>
-        </div>
-      </div>
-
-      {/* سرچ موبایل */}
-      <label className="relative md:hidden mb-4 block">
-        <SearchRoundedIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="جستجو بین مسیرها…"
-          className="w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400"
-        />
-      </label>
+          </Box>
+        </Box>
+      </Paper>
 
       {/* States */}
       {isError && <ErrorState onRetry={refetch} />}
@@ -125,13 +194,16 @@ export default function LearningPaths() {
       ) : filtered.length === 0 ? (
         <EmptyState onCreate={() => setOpen(true)} />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((p) => (
-            <PathCard key={p.id} p={p} />
+        <Grid container spacing={2}>
+          {filtered.map((p, i) => (
+            <Grid key={p.id} item xs={12} sm={6} xl={4}>
+              <PathCard p={p} delay={i * 0.04} />
+            </Grid>
           ))}
-        </div>
+        </Grid>
       )}
 
+      {/* Dialog */}
       {open && (
         <AddPathDialog
           onClose={() => setOpen(false)}
@@ -144,170 +216,296 @@ export default function LearningPaths() {
   );
 }
 
-/* -------------------- Subcomponents -------------------- */
+/* ========================= Components ========================= */
 
-function PathCard({ p }) {
-  const progress = getProgress(p); // 0..100
-  const totalChapters =
-    p.stats?.total ?? p.lessonsCount ?? p.units?.length ?? 0;
-  const doneChapters =
+function PathCard({ p, delay = 0 }) {
+  const t = useTheme();
+  const progress = getProgress(p);
+  const total = p.stats?.total ?? p.lessonsCount ?? p.units?.length ?? 0;
+  const done =
     p.stats?.completed ??
     p.completedCount ??
-    Math.round((progress * totalChapters) / 100);
+    Math.round((progress * total) / 100);
 
   return (
-    <article className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
+    <Card
+      component={motion.div}
+      {...slideLeft(delay)}
+      elevation={0}
+      sx={glassCard(t)}
+    >
+      <CardHeader
+        sx={{ pb: 1 }}
+        title={
+          <Stack direction="row" alignItems="center" gap={1} minWidth={0}>
+            <Typography
+              noWrap
+              variant="subtitle1"
+              sx={{ fontWeight: 900, flex: 1, minWidth: 0 }}
+              title={p.title}
+            >
+              {p.title}
+            </Typography>
             {p.starred && (
-              <span
-                className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2 py-0.5 text-[11px] font-bold text-yellow-700"
-                title="نشان‌شده"
-              >
-                <StarBorderRoundedIcon fontSize="inherit" />
-                برگزیده
-              </span>
+              <Chip
+                size="small"
+                icon={<StarRoundedIcon />}
+                label="برگزیده"
+                color="warning"
+                variant="outlined"
+                sx={{ fontWeight: 800 }}
+              />
             )}
             {p.duration && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-600">
-                <AccessTimeRoundedIcon fontSize="inherit" />
-                {formatDuration(p.duration)}
-              </span>
+              <Chip
+                size="small"
+                icon={<AccessTimeRoundedIcon />}
+                label={formatDuration(p.duration)}
+                variant="outlined"
+              />
             )}
-          </div>
-          <h3 className="mt-1 truncate text-lg font-extrabold">{p.title}</h3>
-          {p.description && (
-            <p className="mt-1 line-clamp-2 text-sm text-slate-600">
-              {p.description}
-            </p>
-          )}
-        </div>
-
-        <button
-          className="h-8 w-8 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"
-          title="گزینه‌ها"
-        >
-          <MoreHorizRoundedIcon fontSize="small" />
-        </button>
-      </div>
-
-      {/* Progress */}
-      <div className="mt-4">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-slate-700">پیشرفت</span>
-          <span className="font-extrabold text-slate-900">{progress}%</span>
-        </div>
-        <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-          <div
-            className="h-full rounded-full bg-gradient-to-l from-violet-500 to-violet-600 transition-[width]"
-            style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-          />
-        </div>
-        {totalChapters > 0 && (
-          <div className="mt-1.5 text-xs text-slate-600">
-            {doneChapters} از {totalChapters} فصل/درس تکمیل شده
-          </div>
+          </Stack>
+        }
+        action={
+          <IconButton size="small">
+            <MoreHorizRoundedIcon />
+          </IconButton>
+        }
+      />
+      <CardContent sx={{ pt: 0 }}>
+        {p.description && (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              mb: 1,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {p.description}
+          </Typography>
         )}
-      </div>
 
-      {/* Footer actions */}
-      <div className="mt-4 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          {progress >= 100 ? (
-            <span className="inline-flex items-center gap-1 font-bold text-emerald-600">
-              <CheckCircleRoundedIcon fontSize="small" />
-              تکمیل شد
-            </span>
-          ) : p.nextDue ? (
-            <span className="inline-flex items-center gap-1">
-              <AccessTimeRoundedIcon fontSize="small" />
-              موعد بعدی: {formatDate(p.nextDue)}
-            </span>
-          ) : null}
-        </div>
-
-        <Link
-          to={`/paths/${p.id}`}
-          className="inline-flex items-center gap-1 rounded-xl bg-violet-600 px-3 py-2 text-sm font-bold text-white hover:bg-violet-700"
+        {/* Progress */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
         >
-          ادامه بده
-          <PlayArrowRoundedIcon fontSize="small" />
-        </Link>
-      </div>
-    </article>
+          <Typography variant="caption" sx={{ fontWeight: 800 }}>
+            پیشرفت
+          </Typography>
+          <Typography variant="caption" sx={{ fontWeight: 900 }}>
+            {progress}%
+          </Typography>
+        </Stack>
+        <LinearProgress
+          variant="determinate"
+          value={progress}
+          sx={{
+            mt: 1,
+            height: 10,
+            borderRadius: 6,
+            bgcolor: (th) => alpha(th.palette.primary.main, 0.08),
+            "& .MuiLinearProgress-bar": {
+              borderRadius: 6,
+              transition: "width .6s ease",
+              background: (th) =>
+                `linear-gradient(90deg, ${th.palette.primary.main}, ${alpha(
+                  th.palette.primary.dark,
+                  0.9
+                )})`,
+            },
+          }}
+        />
+        {total > 0 && (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mt: 0.75, display: "block" }}
+          >
+            {done} از {total} فصل/درس تکمیل شده
+          </Typography>
+        )}
+
+        {/* Footer */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ mt: 1.5 }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {progress >= 100 ? (
+              <Chip
+                size="small"
+                color="success"
+                label="تکمیل شد"
+                icon={<CheckCircleRoundedIcon />}
+                variant="outlined"
+              />
+            ) : p.nextDue ? (
+              <Chip
+                size="small"
+                variant="outlined"
+                icon={<AccessTimeRoundedIcon />}
+                label={`موعد بعدی: ${formatDate(p.nextDue)}`}
+              />
+            ) : null}
+          </Box>
+          <Button
+            component={Link}
+            to={`/paths/${p.id}`}
+            variant="contained"
+            endIcon={<PlayArrowRoundedIcon />}
+            sx={{ fontWeight: 900, borderRadius: 2 }}
+          >
+            ادامه بده
+          </Button>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 }
 
 function SkeletonGrid() {
+  const t = useTheme();
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <Grid container spacing={2}>
       {Array.from({ length: 6 }).map((_, i) => (
-        <div
-          key={i}
-          className="rounded-2xl border border-slate-200 bg-white p-4"
-        >
-          <div className="h-5 w-40 animate-pulse rounded bg-slate-100" />
-          <div className="mt-2 h-4 w-64 animate-pulse rounded bg-slate-100" />
-          <div className="mt-1 h-4 w-56 animate-pulse rounded bg-slate-100" />
-          <div className="mt-4 h-2 w-full animate-pulse rounded bg-slate-100" />
-          <div className="mt-2 h-2 w-1/2 animate-pulse rounded bg-slate-100" />
-          <div className="mt-4 flex justify-end">
-            <div className="h-9 w-24 animate-pulse rounded bg-slate-100" />
-          </div>
-        </div>
+        <Grid key={i} item xs={12} sm={6} xl={4}>
+          <Card
+            component={motion.div}
+            {...fadeUp(i * 0.04)}
+            elevation={0}
+            sx={glassCard(t)}
+          >
+            <CardContent>
+              <Box
+                sx={{
+                  height: 14,
+                  width: 220,
+                  bgcolor: "action.hover",
+                  borderRadius: 1,
+                }}
+              />
+              <Box
+                sx={{
+                  mt: 1,
+                  height: 12,
+                  width: 300,
+                  bgcolor: "action.hover",
+                  borderRadius: 1,
+                }}
+              />
+              <Box
+                sx={{
+                  mt: 1,
+                  height: 12,
+                  width: 260,
+                  bgcolor: "action.hover",
+                  borderRadius: 1,
+                }}
+              />
+              <Box
+                sx={{
+                  mt: 2,
+                  height: 10,
+                  width: "100%",
+                  bgcolor: "action.hover",
+                  borderRadius: 1,
+                }}
+              />
+              <Stack direction="row" justifyContent="flex-end" sx={{ mt: 2 }}>
+                <Box
+                  sx={{
+                    height: 36,
+                    width: 120,
+                    bgcolor: "action.hover",
+                    borderRadius: 1,
+                  }}
+                />
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
       ))}
-    </div>
+    </Grid>
   );
 }
 
 function EmptyState({ onCreate }) {
+  const t = useTheme();
   return (
-    <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center">
-      <div className="mx-auto max-w-md px-4">
-        <h3 className="text-lg font-extrabold text-slate-900">
-          هنوز مسیری تعریف نکردی
-        </h3>
-        <p className="mt-2 text-sm text-slate-600">
-          با ساخت یک «مسیر یادگیری»، فصل‌ها و اهداف هفتگی‌ات را منظم کن تا
-          پیشرفتت همیشه جلوی چشم باشد.
-        </p>
-        <div className="mt-6 flex items-center justify-center gap-2">
-          <button
-            className="btn-primary inline-flex items-center gap-2"
-            onClick={onCreate}
-          >
-            <AddRoundedIcon />
-            ساخت مسیر جدید
-          </button>
-        </div>
-      </div>
-    </div>
+    <Paper
+      component={motion.div}
+      {...fadeUp(0.04)}
+      elevation={0}
+      sx={{
+        ...glassCard(t),
+        borderStyle: "dashed",
+        py: 6,
+        textAlign: "center",
+      }}
+    >
+      <Typography sx={{ fontWeight: 900, mb: 1 }}>
+        هنوز مسیری تعریف نکردی
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        با ساخت یک «مسیر یادگیری»، فصل‌ها و اهداف هفتگی‌ات را منظم کن تا پیشرفتت
+        همیشه جلوی چشم باشد.
+      </Typography>
+      <Button
+        onClick={onCreate}
+        startIcon={<AddRoundedIcon />}
+        variant="contained"
+        sx={{ mt: 2, fontWeight: 900 }}
+      >
+        ساخت مسیر جدید
+      </Button>
+    </Paper>
   );
 }
 
 function ErrorState({ onRetry }) {
+  const t = useTheme();
   return (
-    <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="font-extrabold text-rose-700">خطا در دریافت مسیرها</h3>
-          <p className="text-sm text-rose-700/80">لطفاً دوباره تلاش کن.</p>
-        </div>
-        <button
+    <Paper
+      elevation={0}
+      sx={{
+        ...glassCard(t),
+        borderColor: alpha("#ef4444", 0.35),
+        bgcolor: alpha("#ef4444", 0.04),
+        p: 2,
+        mb: 2,
+      }}
+    >
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Box>
+          <Typography sx={{ fontWeight: 900, color: "#b91c1c" }}>
+            خطا در دریافت مسیرها
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            لطفاً دوباره تلاش کن.
+          </Typography>
+        </Box>
+        <Button
+          variant="outlined"
+          color="error"
           onClick={onRetry}
-          className="rounded-xl border border-rose-200 bg-white px-3 py-2 text-sm font-bold text-rose-700 hover:bg-rose-100"
+          sx={{ fontWeight: 900 }}
         >
           تلاش مجدد
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Stack>
+    </Paper>
   );
 }
 
-/* -------------------- Helpers -------------------- */
-
+/* ============================ Helpers ============================ */
 function filterLabel(filter) {
   switch (filter) {
     case "all":
@@ -322,20 +520,16 @@ function filterLabel(filter) {
       return "همه";
   }
 }
-
 function getProgress(p) {
-  // از هر فیلدی که در دیتای فعلی‌ات هست محاسبه می‌کند
   if (typeof p.progress === "number") return clamp(p.progress, 0, 100);
   if (p.stats?.total > 0 && typeof p.stats?.completed === "number") {
     return clamp(Math.round((p.stats.completed / p.stats.total) * 100), 0, 100);
   }
   return 0;
 }
-
 function clamp(v, min, max) {
   return Math.min(max, Math.max(min, v));
 }
-
 function formatDuration(mins) {
   if (!mins) return "—";
   const h = Math.floor(mins / 60);
@@ -344,7 +538,6 @@ function formatDuration(mins) {
   if (h) return `${h}ساعت`;
   return `${m}دقیقه`;
 }
-
 function formatDate(iso) {
   try {
     const d = new Date(iso);
