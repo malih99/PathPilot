@@ -7,6 +7,7 @@ import FocusTimer from "../components/dashboardPro/FocusTimer";
 import RecentPaths from "../components/dashboardPro/RecentPaths";
 import ActivityFeed from "../components/dashboardPro/ActivityFeed";
 import QuickAddDialog from "../components/dashboardPro/QuickAddDialog";
+import PlaceholderCard from "../components/dashboardPro/PlaceholderCard";
 
 const mockStats = [
   { id: "tasks", label: "Tasks left", value: 12, hint: "", icon: "tasks" },
@@ -34,12 +35,14 @@ const mockTasks = [
 const mockPaths = [
   {
     id: "p1",
+    icon: "react",
     title: "React — از صفر تا تولید",
     description: "هوک‌ها، فرم‌ها، مدیریت وضعیت",
     progress: 40,
   },
   {
     id: "p2",
+    icon: "ts",
     title: "TypeScript Deep Dive",
     description: "Generics, Utility Types, TSConfig",
     progress: 62,
@@ -61,34 +64,26 @@ export default function DashboardPro() {
 
   return (
     <DashboardLayout>
-      {/* هدر بزرگ + استتس‌های کوچک سمت راست */}
       <HeroBar
         onQuickAdd={() => setOpenAdd(true)}
         miniStats={mockStats}
         daysStreak={999}
       />
 
-      {/* گرید سه‌ستونه با ستون وسط عریض‌تر */}
       <div className="grid grid-cols-1 xl:grid-cols-6 gap-4">
-        {/* چپ: Task list + یک تایمر کوچک (دلخواه) */}
+        {" "}
         <div className="xl:col-span-2 space-y-4">
-          <UpcomingList items={mockTasks} title="Task list" showAdd />
-          {/* تایمر کوچک (می‌تونی حذفش کنی اگر نمی‌خوای) */}
-          <div className="hidden lg:block">
-            <FocusTimer defaultMinutes={25} />
-          </div>
+          <RecentPaths items={mockPaths} title="مسیرهای یادگیری" />
+          <ActivityFeed items={mockActivity} />+{" "}
         </div>
-
-        {/* وسط: Weekly targets (عریض) */}
         <div className="xl:col-span-3 space-y-4">
-          <GoalsProgress goals={mockGoals} title="Weekly targets" />
+          <GoalsProgress goals={mockGoals} title="اهداف این هفته" />
+          <FocusTimer defaultMinutes={25} />+{" "}
         </div>
-
-        {/* راست: Recent learning paths + Activity */}
         <div className="xl:col-span-1 space-y-4">
-          <RecentPaths items={mockPaths} title="Recent learning paths" />
-          <ActivityFeed items={mockActivity} />
-        </div>
+          <UpcomingList items={mockTasks} title="لیست کارها" showAdd />
+          <PlaceholderCard title="پومودورو" />+{" "}
+        </div>{" "}
       </div>
 
       <QuickAddDialog

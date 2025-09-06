@@ -2,6 +2,8 @@ import { Box, Stack, Typography, Paper } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
 import { motion } from "framer-motion";
 import { fadeUp } from "./_shared";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import { Chip, InputBase } from "@mui/material";
 
 function StatPill({ value, label }) {
   return (
@@ -66,14 +68,39 @@ export default function HeroBar({
           <Typography sx={{ fontSize: 28, fontWeight: 900, mb: 0.5 }}>
             خوش برگشتی
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            امروز روی مهم‌ترین کارها تمرکز کن — <b>{daysStreak}</b> روزِ تمرکز
-            پیاپی!
-          </Typography>
+          <Stack direction="row" alignItems="center" gap={1}>
+            <Chip
+              label={`${daysStreak} روز تمرکز پیاپی`}
+              color="primary"
+              variant="outlined"
+              size="small"
+            />
+            <Typography variant="body2" color="text.secondary">
+              امروز روی مهم‌ترین کارها تمرکز کن
+            </Typography>
+          </Stack>
         </Box>
 
-        {/* استتس‌های کوچک شبیه تصویر */}
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Box
+            sx={{
+              display: { xs: "none", md: "flex" },
+              alignItems: "center",
+              gap: 0.5,
+              px: 1.5,
+              py: 1,
+              borderRadius: 999,
+              border: (th) =>
+                `1px solid ${alpha(th.palette.primary.main, 0.18)}`,
+              bgcolor: (th) =>
+                th.palette.mode === "light"
+                  ? "rgba(255,255,255,.9)"
+                  : alpha(th.palette.background.paper, 0.6),
+            }}
+          >
+            <SearchRoundedIcon fontSize="small" />
+            <InputBase placeholder="جستجو..." sx={{ fontSize: 14 }} />
+          </Box>
           {miniStats.map((s) => (
             <StatPill key={s.id} value={s.value} label={s.label} />
           ))}

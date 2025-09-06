@@ -16,6 +16,7 @@ import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import { useTheme } from "@mui/material/styles";
 import Sidebar, { DRAWER_WIDTH, MINI_WIDTH } from "../components/SidebarPro";
 import ThemeToggleFloating from "../components/ThemeToggleFloating";
+import BackgroundFX from "../components/dashboardPro/BackgroundFX";
 
 function useLocalMode() {
   const theme = useTheme();
@@ -54,9 +55,11 @@ export default function DashboardLayout({ children }) {
         display: "flex",
         flexDirection: "row",
         minHeight: "100vh",
-        bgcolor: "#f3f4f6",
+        bgcolor: "transparent",
+        position: "relative",
       }}
     >
+      <BackgroundFX />
       <CssBaseline />
 
       <AppBar
@@ -68,7 +71,7 @@ export default function DashboardLayout({ children }) {
             : { right: sidebarOffset, left: 0 }),
           height: 56,
           zIndex: (t) => t.zIndex.drawer + 1,
-          background: "rgba(230,237,245,.85)",
+          background: "rgba(248,250,255,.72)",
           color: "#1e293b",
           borderBottom: "1px solid #d9e2ec",
           backdropFilter: "saturate(140%) blur(6px)",
